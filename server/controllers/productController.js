@@ -1,5 +1,7 @@
 const ApiError = require('../error/ApiError');
-const {Product} = require('../models/models')
+const {Product} = require('../models/models');
+const uuid = require('uuid');
+const path = require('path');
 
 class ProductController {
     async getAll(req, res, next) {
@@ -8,13 +10,17 @@ class ProductController {
     }
 
     async create(req, res, next) {
-        const {name, price, img, quantity, info} = req.body;
-        if (name && price && img && quantity && info) {
-            const product = await Product.create({name, price, img, quantity, info});
+        try {
+            const {name, price, quantity, info} = req.body;
+            const {img} = req.files;
+            let filename = uuid.v4() + '.jpg';
+            img.mv(path.resolve(__dirname, '..', 'static', filename));
+            const product = await Product.create({name, price, img: filename, quantity, info});
             return res.json(product);
-        } else {
-            return res.json({message: 'Не все поля'})
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
         }
+        
     }
 
     async getOne(req, res, next) {
