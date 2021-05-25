@@ -13,7 +13,7 @@ class ProductController {
         try {
             const {name, price, quantity, info} = req.body;
             const {img} = req.files;
-            let filename = uuid.v4() + '.jpg';
+            let filename = uuid.v4() + '.   jpg';
             img.mv(path.resolve(__dirname, '..', 'static', filename));
             const product = await Product.create({name, price, img: filename, quantity, info});
             return res.json(product);
